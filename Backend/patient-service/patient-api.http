@@ -1,0 +1,63 @@
+### Tests de l'API patient-service (IntelliJ HTTP Client ou extension REST Client de VS Code)
+@base = http://localhost:8081/api/patients
+
+### Créer un patient -> 201
+POST {{base}}
+Content-Type: application/json
+
+{
+  "firstName": "Amine",
+  "lastName": "Ben Ali",
+  "birthDate": "1995-04-12",
+  "gender": "MALE",
+  "phone": "+21620123456",
+  "email": "amine.benali@mail.tn",
+  "address": "Ariana, Tunis",
+  "bloodType": "O_POS",
+  "allergies": "Pénicilline",
+  "emergencyContact": "Sami Ben Ali - 98123456"
+}
+
+### Lister (pagination + tri) -> 200
+GET {{base}}?page=0&size=10&sort=lastName
+
+### Rechercher -> 200
+GET {{base}}?search=ben
+
+### Détails -> 200 (ou 404)
+GET {{base}}/1
+
+### Existe ? (utilisé par les autres microservices)
+GET {{base}}/1/exists
+
+### Modifier -> 200
+PUT {{base}}/1
+Content-Type: application/json
+
+{
+  "firstName": "Amine",
+  "lastName": "Ben Ali",
+  "birthDate": "1995-04-12",
+  "gender": "MALE",
+  "phone": "+21620999999",
+  "email": "amine.benali@mail.tn",
+  "address": "La Marsa, Tunis",
+  "bloodType": "O_POS",
+  "allergies": "Pénicilline, arachides",
+  "emergencyContact": "Sami Ben Ali - 98123456"
+}
+
+### Données invalides -> 400
+POST {{base}}
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "lastName": "Test",
+  "birthDate": "2099-01-01",
+  "gender": "MALE",
+  "email": "pas-un-email"
+}
+
+### Supprimer -> 204
+DELETE {{base}}/1
