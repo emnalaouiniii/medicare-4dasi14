@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  POM agrégateur du Backend MediCare.
+  Ouvrir le dossier Backend dans IntelliJ : tous les microservices apparaissent dans un seul projet.
+  Chaque membre ajoute son module ici quand son microservice a un pom.xml.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>tn.esprit.medicare</groupId>
+    <artifactId>medicare-backend</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>medicare-backend</name>
+
+    <modules>
+        <module>eureka-server</module>
+        <module>api-gateway</module>
+        <module>patient-service</module>
+        <!-- À décommenter quand le service a son pom.xml :
+        <module>config-server</module>
+        <module>doctor-service</module>
+        <module>appointment-service</module>
+        <module>medical-record-service</module>
+        <module>prescription-service</module>
+        <module>billing-service</module>
+        <module>notification-service</module>
+        -->
+    </modules>
+</project>

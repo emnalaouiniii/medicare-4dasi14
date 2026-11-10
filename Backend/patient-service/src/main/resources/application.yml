@@ -20,11 +20,11 @@ spring:
       hibernate:
         format_sql: true
 
-# Eureka : désactivé tant que eureka-server n'est pas encore développé.
-# Pour l'activer : EUREKA_ENABLED=true (ou mettre true ici).
+# Eureka : le service s'enregistre sous le nom PATIENT-SERVICE.
+# Pour lancer le service seul sans eureka-server : EUREKA_ENABLED=false
 eureka:
   client:
-    enabled: ${EUREKA_ENABLED:false}
+    enabled: ${EUREKA_ENABLED:true}
     service-url:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
   instance:
