@@ -1,0 +1,54 @@
+@startuml
+!include style.iuml
+title patient-service - Diagramme de classes
+package "patient-service (MySQL)" {
+class Patient <<Entity>> {
+  - id : Long
+  - keycloakId : String
+  - firstName : String
+  - lastName : String
+  - birthDate : LocalDate
+  - gender : Gender
+  - phone : String
+  - email : String
+  - address : String
+  - bloodType : BloodType
+  - allergies : String
+  - emergencyContact : String
+}
+enum Gender {
+  MALE
+  FEMALE
+}
+enum BloodType {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+class PatientController <<RestController>> {
+  + create(PatientRequest) : ResponseEntity
+  + getById(Long) : PatientResponse
+  + getMe(Jwt) : PatientResponse
+  + getAll(Pageable) : Page<PatientResponse>
+  + update(Long, PatientRequest) : PatientResponse
+  + delete(Long) : void
+}
+class PatientService <<Service>>
+interface PatientRepository <<JpaRepository>>
+Patient --> Gender
+Patient --> BloodType
+PatientController --> PatientService
+PatientService --> PatientRepository
+PatientRepository ..> Patient
+}
+note bottom of PatientController
+Appelé en synchrone (OpenFeign) par
+appointment, prescription et medical-record
+pour vérifier l'existence d'un patient.
+end note
+@enduml

@@ -1,0 +1,39 @@
+@startuml
+!include style.iuml
+title prescription-service - Diagramme de classes
+package "prescription-service (PostgreSQL)" {
+class Prescription <<Entity>> {
+  - id : Long
+  - patientId : Long
+  - doctorId : Long
+  - appointmentId : Long
+  - issueDate : LocalDate
+  - status : PrescriptionStatus
+}
+class PrescriptionItem <<Entity>> {
+  - id : Long
+  - medicationName : String
+  - dosage : String
+  - duration : String
+}
+enum PrescriptionStatus {
+  ISSUED
+  DISPENSED
+}
+class PrescriptionController <<RestController>> {
+  + create(PrescriptionRequest)
+  + getById(Long)
+  + getByPatient(Long)
+  + dispense(Long)
+}
+interface PatientClient <<FeignClient>>
+class PrescriptionEventProducer <<KafkaProducer>> {
+  + publishCreated(PrescriptionEvent)
+}
+Prescription "1" *-- "1..*" PrescriptionItem
+Prescription --> PrescriptionStatus
+PrescriptionController ..> Prescription
+PrescriptionController --> PatientClient
+PrescriptionController --> PrescriptionEventProducer
+}
+@enduml

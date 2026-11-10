@@ -1,0 +1,45 @@
+@startuml
+!include style.iuml
+title notification-service (commun) - Diagramme de classes
+package "notification-service (MongoDB)" {
+class Notification <<Document>> {
+  - id : String
+  - recipientId : String
+  - type : NotificationType
+  - channel : Channel
+  - subject : String
+  - message : String
+  - sentAt : Date
+  - read : boolean
+}
+enum NotificationType {
+  APPOINTMENT_CONFIRMED
+  APPOINTMENT_REMINDER
+  APPOINTMENT_CANCELLED
+  PRESCRIPTION_CREATED
+  PAYMENT_COMPLETED
+}
+enum Channel {
+  EMAIL
+  IN_APP
+}
+class NotificationEventListener <<KafkaListener>> {
+  + onAppointmentBooked(AppointmentEvent)
+  + onAppointmentCancelled(AppointmentEvent)
+  + onPrescriptionCreated(PrescriptionEvent)
+  + onPaymentCompleted(PaymentEvent)
+}
+class EmailSender <<Service>> {
+  + send(to, subject, body)
+}
+class NotificationController <<RestController>> {
+  + getMine(Jwt)
+  + markAsRead(String)
+}
+Notification --> NotificationType
+Notification --> Channel
+NotificationEventListener --> EmailSender
+NotificationEventListener ..> Notification
+NotificationController ..> Notification
+}
+@enduml

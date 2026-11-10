@@ -1,0 +1,60 @@
+@startuml
+!include style.iuml
+title appointment-service - Diagramme de classes
+package "appointment-service (MySQL)" {
+class Appointment <<Entity>> {
+  - id : Long
+  - patientId : Long
+  - doctorId : Long
+  - availabilityId : Long
+  - dateTime : LocalDateTime
+  - reason : String
+  - status : AppointmentStatus
+  - createdAt : LocalDateTime
+}
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+class AppointmentController <<RestController>> {
+  + book(AppointmentRequest)
+  + getById(Long)
+  + getByPatient(Long)
+  + getByDoctor(Long, LocalDate)
+  + cancel(Long)
+  + complete(Long)
+}
+class AppointmentService <<Service>>
+interface PatientClient <<FeignClient>> {
+  + getPatient(Long) : PatientDto
+}
+interface DoctorClient <<FeignClient>> {
+  + getSlot(Long, Long) : SlotDto
+  + bookSlot(Long) : SlotDto
+}
+class AppointmentEventProducer <<KafkaProducer>> {
+  + publishBooked(AppointmentEvent)
+  + publishCancelled(AppointmentEvent)
+  + publishCompleted(AppointmentEvent)
+}
+class AppointmentEvent <<Event>> {
+  - eventType : String
+  - appointmentId : Long
+  - patientId : Long
+  - doctorId : Long
+  - dateTime : LocalDateTime
+}
+Appointment --> AppointmentStatus
+AppointmentController --> AppointmentService
+AppointmentService --> PatientClient
+AppointmentService --> DoctorClient
+AppointmentService --> AppointmentEventProducer
+AppointmentEventProducer ..> AppointmentEvent
+AppointmentService ..> Appointment
+}
+PatientClient ..> "patient-service" : REST
+DoctorClient ..> "doctor-service" : REST
+AppointmentEventProducer ..> "Kafka" : appointment.*
+@enduml

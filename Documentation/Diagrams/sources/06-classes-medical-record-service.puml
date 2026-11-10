@@ -1,0 +1,46 @@
+@startuml
+!include style.iuml
+title medical-record-service - Diagramme de classes
+package "medical-record-service (MongoDB)" {
+class MedicalRecord <<Document>> {
+  - id : String
+  - patientId : Long
+  - antecedents : List<String>
+  - createdAt : Date
+}
+class Consultation <<Embedded>> {
+  - appointmentId : Long
+  - doctorId : Long
+  - date : LocalDateTime
+  - diagnosis : String
+  - notes : String
+}
+class PrescriptionRef <<Embedded>> {
+  - prescriptionId : Long
+  - issueDate : LocalDate
+}
+class MedicalDocument <<Embedded>> {
+  - name : String
+  - type : DocumentType
+  - url : String
+  - uploadedAt : Date
+}
+enum DocumentType {
+  ANALYSIS
+  RADIO
+  REPORT
+  OTHER
+}
+class MedicalRecordController <<RestController>>
+class RecordEventListener <<KafkaListener>> {
+  + onAppointmentCompleted(AppointmentEvent)
+  + onPrescriptionCreated(PrescriptionEvent)
+}
+MedicalRecord "1" *-- "0..*" Consultation
+MedicalRecord "1" *-- "0..*" PrescriptionRef
+MedicalRecord "1" *-- "0..*" MedicalDocument
+MedicalDocument --> DocumentType
+MedicalRecordController ..> MedicalRecord
+RecordEventListener ..> MedicalRecord
+}
+@enduml

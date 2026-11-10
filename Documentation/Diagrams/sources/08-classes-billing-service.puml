@@ -1,0 +1,52 @@
+@startuml
+!include style.iuml
+title billing-service - Diagramme de classes
+package "billing-service (PostgreSQL)" {
+class Invoice <<Entity>> {
+  - id : Long
+  - patientId : Long
+  - appointmentId : Long
+  - amount : BigDecimal
+  - issueDate : LocalDate
+  - status : InvoiceStatus
+}
+class Payment <<Entity>> {
+  - id : Long
+  - method : PaymentMethod
+  - amount : BigDecimal
+  - paidAt : LocalDateTime
+}
+enum InvoiceStatus {
+  UNPAID
+  PAID
+  CANCELLED
+}
+enum PaymentMethod {
+  CARD
+  CASH
+}
+class InvoiceController <<RestController>> {
+  + getById(Long)
+  + getByPatient(Long)
+  + pay(Long, PaymentRequest)
+  + getByStatus(InvoiceStatus)
+}
+interface DoctorClient <<FeignClient>> {
+  + getDoctor(Long) : DoctorDto
+}
+class BillingEventListener <<KafkaListener>> {
+  + onBooked(AppointmentEvent) : crée la facture
+  + onCancelled(AppointmentEvent) : annule la facture
+}
+class PaymentEventProducer <<KafkaProducer>> {
+  + publishCompleted(PaymentEvent)
+}
+Invoice "1" -- "0..1" Payment
+Invoice --> InvoiceStatus
+Payment --> PaymentMethod
+InvoiceController ..> Invoice
+InvoiceController --> PaymentEventProducer
+BillingEventListener ..> Invoice
+BillingEventListener --> DoctorClient
+}
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+!include style.iuml
+title Interactions entre microservices
+left to right direction
+component "appointment-service" as AP
+component "patient-service" as PA
+component "doctor-service" as DO
+component "prescription-service" as PR
+component "billing-service" as BI
+component "medical-record-service" as MR
+component "notification-service\n(commun)" as NO
+queue "Kafka" as K
+AP --> PA : REST
+AP --> DO : REST
+PR --> PA : REST
+BI --> DO : REST
+MR --> PA : REST
+AP ..> K : appointment.*
+PR ..> K : prescription.created
+BI ..> K : payment.completed
+K ..> NO : tous les événements
+K ..> BI : appointment.booked/cancelled
+K ..> MR : appointment.completed\nprescription.created
+K ..> DO : appointment.cancelled
+legend right
+  —— synchrone (OpenFeign)
+  - - asynchrone (Kafka)
+endlegend
+@enduml

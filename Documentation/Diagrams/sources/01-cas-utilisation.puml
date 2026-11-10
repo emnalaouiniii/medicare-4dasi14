@@ -1,0 +1,52 @@
+@startuml
+!include style.iuml
+left to right direction
+title MediCare - Diagramme de cas d'utilisation général
+actor Patient
+actor "Médecin" as Doc
+actor Pharmacien as Ph
+actor Administrateur as Adm
+actor "Système de notification" as Sys <<système>>
+rectangle MediCare {
+  usecase "S'authentifier" as UC0
+  usecase "Gérer son profil" as UC1
+  usecase "Rechercher un médecin\npar spécialité" as UC2
+  usecase "Prendre un rendez-vous" as UC3
+  usecase "Annuler / reporter\nun rendez-vous" as UC4
+  usecase "Consulter son\ndossier médical" as UC5
+  usecase "Consulter ses ordonnances" as UC6
+  usecase "Payer une facture" as UC7
+  usecase "Gérer son planning" as UC8
+  usecase "Consulter ses rendez-vous" as UC9
+  usecase "Ajouter une consultation" as UC10
+  usecase "Rédiger une ordonnance" as UC11
+  usecase "Délivrer une ordonnance" as UC12
+  usecase "Gérer médecins\net spécialités" as UC13
+  usecase "Gérer les utilisateurs" as UC14
+  usecase "Suivre la facturation" as UC15
+  usecase "Envoyer une notification" as UC16
+}
+Patient --> UC1
+Patient --> UC2
+Patient --> UC3
+Patient --> UC4
+Patient --> UC5
+Patient --> UC6
+Patient --> UC7
+Doc --> UC8
+Doc --> UC9
+Doc --> UC10
+Doc --> UC11
+Ph --> UC6
+Ph --> UC12
+Adm --> UC13
+Adm --> UC14
+Adm --> UC15
+UC3 ..> UC0 : <<include>>
+UC7 ..> UC0 : <<include>>
+UC11 ..> UC0 : <<include>>
+UC12 ..> UC0 : <<include>>
+UC13 ..> UC0 : <<include>>
+UC3 <.. UC16 : <<extend>>
+UC16 <-- Sys
+@enduml

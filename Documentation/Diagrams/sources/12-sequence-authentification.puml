@@ -1,0 +1,24 @@
+@startuml
+!include style.iuml
+title Séquence - Authentification avec Keycloak
+actor Utilisateur as U
+participant Angular as UI
+participant Keycloak as KC
+participant "API Gateway" as GW
+participant "microservice" as MS
+U -> UI : accéder à MediCare
+UI -> KC : redirection login (Authorization Code + PKCE)
+U -> KC : saisir identifiants
+KC --> UI : code d'autorisation
+UI -> KC : échanger le code
+KC --> UI : access token JWT (rôles)
+UI -> GW : requête + Authorization: Bearer JWT
+GW -> GW : vérifier signature et expiration
+GW -> MS : requête + JWT
+MS -> MS : @PreAuthorize(hasRole)
+alt rôle autorisé
+  MS --> UI : 200 OK
+else rôle insuffisant
+  MS --> UI : 403 Forbidden
+end
+@enduml

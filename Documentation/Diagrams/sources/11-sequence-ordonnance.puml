@@ -1,0 +1,24 @@
+@startuml
+!include style.iuml
+title Séquence - Création d'une ordonnance
+actor "Médecin" as Doc
+participant "API Gateway" as GW
+participant "prescription-service" as PR
+participant "patient-service" as PA
+queue "Kafka" as K
+participant "medical-record-service" as MR
+participant "notification-service" as NO
+actor Pharmacien as Ph
+Doc -> GW : POST /api/prescriptions
+GW -> PR : route
+PR -> PA : GET /api/patients/{id}
+PA --> PR : 200 OK
+PR -> PR : enregistrer (ISSUED)
+PR --> Doc : 201 Created
+PR ->> K : publish prescription.created
+K ->> MR : ajouter la référence au dossier
+K ->> NO : notifier le patient
+Ph -> GW : PATCH /api/prescriptions/{id}/dispense
+GW -> PR : route
+PR --> Ph : 200 OK (DISPENSED)
+@enduml

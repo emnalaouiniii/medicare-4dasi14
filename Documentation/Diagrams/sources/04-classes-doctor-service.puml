@@ -1,0 +1,46 @@
+@startuml
+!include style.iuml
+title doctor-service - Diagramme de classes
+package "doctor-service (MySQL)" {
+class Doctor <<Entity>> {
+  - id : Long
+  - keycloakId : String
+  - firstName : String
+  - lastName : String
+  - phone : String
+  - email : String
+  - consultationFee : BigDecimal
+}
+class Speciality <<Entity>> {
+  - id : Long
+  - name : String
+  - description : String
+}
+class Availability <<Entity>> {
+  - id : Long
+  - date : LocalDate
+  - startTime : LocalTime
+  - endTime : LocalTime
+  - status : SlotStatus
+}
+enum SlotStatus {
+  FREE
+  BOOKED
+}
+class DoctorController <<RestController>>
+class AvailabilityController <<RestController>> {
+  + addSlot(Long, AvailabilityRequest)
+  + getFreeSlots(Long, LocalDate)
+  + book(Long slotId)
+}
+class AppointmentCancelledListener <<KafkaListener>> {
+  + onCancelled(AppointmentEvent) : libère le créneau
+}
+Speciality "1" -- "0..*" Doctor
+Doctor "1" *-- "0..*" Availability
+Availability --> SlotStatus
+DoctorController ..> Doctor
+AvailabilityController ..> Availability
+AppointmentCancelledListener ..> Availability
+}
+@enduml

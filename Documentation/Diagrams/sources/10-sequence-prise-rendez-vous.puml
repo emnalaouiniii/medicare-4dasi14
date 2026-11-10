@@ -1,0 +1,33 @@
+@startuml
+!include style.iuml
+title Séquence - Prise de rendez-vous (synchrone + asynchrone)
+actor Patient
+participant "Angular" as UI
+participant "API Gateway" as GW
+participant "appointment-service" as AP
+participant "patient-service" as PA
+participant "doctor-service" as DO
+queue "Kafka" as K
+participant "billing-service" as BI
+participant "notification-service" as NO
+Patient -> UI : choisir médecin + créneau
+UI -> GW : POST /api/appointments (JWT)
+GW -> GW : valider JWT (Keycloak)
+GW -> AP : route lb://APPOINTMENT-SERVICE
+== Communication synchrone (OpenFeign) ==
+AP -> PA : GET /api/patients/{id}
+PA --> AP : 200 OK
+AP -> DO : GET /api/doctors/{id}/availabilities/{slotId}
+DO --> AP : 200 OK (FREE)
+AP -> DO : PATCH /availabilities/{slotId}/book
+DO --> AP : 200 OK (BOOKED)
+AP -> AP : enregistrer (CONFIRMED)
+AP --> GW : 201 Created
+GW --> UI : 201 Created
+== Communication asynchrone (Kafka) ==
+AP ->> K : publish appointment.booked
+K ->> BI : appointment.booked
+BI -> BI : créer facture (UNPAID)
+K ->> NO : appointment.booked
+NO -> NO : envoyer email de confirmation
+@enduml
